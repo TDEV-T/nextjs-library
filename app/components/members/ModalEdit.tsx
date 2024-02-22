@@ -1,12 +1,20 @@
 import { Dialog, Transition } from "@headlessui/react";
 import React, { Fragment, useRef, useState } from "react";
-import { Datum } from "@/app/model/BookModel";
+import { Datum } from "@/app/model/MemberModel";
 import { toast } from "sonner";
-import { createBook } from "@/app/service/book";
+import { deleteMember, updateMember } from "@/app/service/member";
 
-const ModalCreate = ({ fetchData }: { fetchData: any }) => {
+const ModalEditMember = ({
+  bid,
+  data,
+  fetchData,
+}: {
+  bid: String;
+  data: Datum;
+  fetchData: any;
+}) => {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState<Datum | null>(null);
+  const [formData, setFormData] = useState<Datum | null>(data);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -16,8 +24,19 @@ const ModalCreate = ({ fetchData }: { fetchData: any }) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const data = await createBook(formData!);
-    if (data.status) {
+    const data = await updateMember(bid, formData!);
+    if (data.status != null && data.status) {
+      toast.success(data.message);
+      await fetchData();
+    } else {
+      toast.error(data.message);
+    }
+  };
+
+  const handleDelete = async (e: any) => {
+    e.preventDefault();
+    const data = await deleteMember(formData?.m_user!);
+    if (data.status != null && data.status) {
       toast.success(data.message);
       await fetchData();
     } else {
@@ -37,7 +56,7 @@ const ModalCreate = ({ fetchData }: { fetchData: any }) => {
           setOpen(true);
         }}
       >
-        Create Book
+        Edit Member
       </button>
       <Transition.Root show={open} as={Fragment}>
         <Dialog
@@ -77,7 +96,7 @@ const ModalCreate = ({ fetchData }: { fetchData: any }) => {
                           as="h3"
                           className="text-base font-semibold leading-6  dark:text-white text-gray-900"
                         >
-                          Create Book
+                          Edit Book
                         </Dialog.Title>
                         <div className="mt-2">
                           <form
@@ -87,8 +106,8 @@ const ModalCreate = ({ fetchData }: { fetchData: any }) => {
                             <div className="relative z-0 w-full mb-5 group">
                               <input
                                 type="text"
-                                name="b_id"
-                                value={formData?.b_id}
+                                name="m_user"
+                                value={formData?.m_user}
                                 onChange={handleChange}
                                 id="floating_email"
                                 className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
@@ -99,14 +118,14 @@ const ModalCreate = ({ fetchData }: { fetchData: any }) => {
                                 htmlFor="floating_email"
                                 className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                               >
-                                Book ID
+                                Username
                               </label>
                             </div>
                             <div className="relative z-0 w-full mb-5 group">
                               <input
                                 type="text"
-                                name="b_name"
-                                value={formData?.b_name}
+                                name="m_name"
+                                value={formData?.m_name}
                                 onChange={handleChange}
                                 id="floating_password"
                                 className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
@@ -117,14 +136,14 @@ const ModalCreate = ({ fetchData }: { fetchData: any }) => {
                                 htmlFor="floating_password"
                                 className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                               >
-                                Book Name
+                                Name
                               </label>
                             </div>
                             <div className="relative z-0 w-full mb-5 group">
                               <input
-                                type="text"
-                                name="b_writer"
-                                value={formData?.b_writer}
+                                type="password"
+                                name="m_pass"
+                                value={formData?.m_pass}
                                 onChange={handleChange}
                                 id="floating_repeat_password"
                                 className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
@@ -135,34 +154,15 @@ const ModalCreate = ({ fetchData }: { fetchData: any }) => {
                                 htmlFor="floating_repeat_password"
                                 className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                               >
-                                Book Writer
-                              </label>
-                            </div>
-
-                            <div className="relative z-0 w-full mb-5 group">
-                              <input
-                                type="text"
-                                value={formData?.b_category}
-                                name="b_category"
-                                onChange={handleChange}
-                                id="floating_repeat_password"
-                                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                                placeholder=" "
-                                required
-                              />
-                              <label
-                                htmlFor="floating_repeat_password"
-                                className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-                              >
-                                Book Category
+                                Password
                               </label>
                             </div>
 
                             <div className="relative z-0 w-full mb-5 group">
                               <input
                                 type="text"
-                                value={formData?.b_price}
-                                name="b_price"
+                                value={formData?.m_phone}
+                                name="m_phone"
                                 onChange={handleChange}
                                 id="floating_repeat_password"
                                 className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
@@ -173,7 +173,7 @@ const ModalCreate = ({ fetchData }: { fetchData: any }) => {
                                 htmlFor="floating_repeat_password"
                                 className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                               >
-                                Book Price
+                                Phone
                               </label>
                             </div>
 
@@ -181,7 +181,7 @@ const ModalCreate = ({ fetchData }: { fetchData: any }) => {
                               type="submit"
                               className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                             >
-                              Create
+                              Edit
                             </button>
                           </form>
                         </div>
@@ -189,6 +189,14 @@ const ModalCreate = ({ fetchData }: { fetchData: any }) => {
                     </div>
                   </div>
                   <div className="bg-gray-50 px-4 dark:bg-gray-700 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                    <button
+                      type="button"
+                      className="mt-3 inline-flex w-  full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset  hover:bg-red-500 sm:mt-0 sm:w-auto"
+                      onClick={handleDelete}
+                    >
+                      Delete
+                    </button>
+
                     <button
                       type="button"
                       className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
@@ -208,4 +216,4 @@ const ModalCreate = ({ fetchData }: { fetchData: any }) => {
   );
 };
 
-export default ModalCreate;
+export default ModalEditMember;

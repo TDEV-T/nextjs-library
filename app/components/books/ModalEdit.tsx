@@ -2,7 +2,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import React, { Fragment, useRef, useState } from "react";
 import { BookData, Datum } from "@/app/model/BookModel";
 import { toast } from "sonner";
-import { updateBook } from "@/app/service/book";
+import { deleteBook, updateBook } from "@/app/service/book";
 
 const ModalEdit = ({
   bid,
@@ -25,7 +25,18 @@ const ModalEdit = ({
     e.preventDefault();
 
     const data = await updateBook(bid, formData!);
-    if (data.status) {
+    if (data.status != null && data.status) {
+      toast.success(data.message);
+      await fetchData();
+    } else {
+      toast.error(data.message);
+    }
+  };
+
+  const handleDelete = async (e: any) => {
+    e.preventDefault();
+    const data = await deleteBook(formData?.b_id!);
+    if (data.status != null && data.status) {
       toast.success(data.message);
       await fetchData();
     } else {
@@ -197,6 +208,14 @@ const ModalEdit = ({
                     </div>
                   </div>
                   <div className="bg-gray-50 px-4 dark:bg-gray-700 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                    <button
+                      type="button"
+                      className="mt-3 inline-flex w-  full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset  hover:bg-red-500 sm:mt-0 sm:w-auto"
+                      onClick={handleDelete}
+                    >
+                      Delete
+                    </button>
+
                     <button
                       type="button"
                       className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"

@@ -1,8 +1,8 @@
-import { Datum } from "../model/BookModel";
+import { Datum } from "../model/MemberModel";
 
-export async function getBookData() {
+export async function getMemberData() {
   try {
-    const resp = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}books`, {
+    const resp = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}members`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -20,9 +20,9 @@ export async function getBookData() {
   }
 }
 
-export async function createBook(data: Datum) {
+export async function createMember(data: Datum) {
   try {
-    const resp = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}book`, {
+    const resp = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}member`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -40,9 +40,9 @@ export async function createBook(data: Datum) {
     console.log(e);
   }
 }
-export async function updateBook(bid: String, data: Datum) {
+export async function updateMember(mid: String, data: Datum) {
   try {
-    const resp = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}book/${bid}`, {
+    const resp = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}member/${mid}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -61,9 +61,9 @@ export async function updateBook(bid: String, data: Datum) {
   }
 }
 
-export async function deleteBook(bid: String) {
+export async function deleteMember(mid: String) {
   try {
-    const resp = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}book/${bid}`, {
+    const resp = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}member/${mid}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
