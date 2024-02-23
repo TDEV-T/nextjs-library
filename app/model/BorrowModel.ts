@@ -11,8 +11,8 @@ export type BorrowModel = {
 };
 
 export type Datum = {
-  br_date_br?: Date;
-  br_date_rt?: Date;
+  br_date_br?: string;
+  br_date_rt?: string;
   m_user?: string;
   b_id?: string;
   br_fine?: number;

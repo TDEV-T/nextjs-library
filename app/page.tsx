@@ -5,13 +5,14 @@ import ModalCreateBorrow from "@/app/components/borrows/ModalCreate";
 import { BorrowModel } from "@/app/model/BorrowModel";
 import React, { useEffect, useState } from "react";
 import { getBorrowData } from "./service/borrow";
+import ModalEditBorrow from "./components/borrows/ModalEdit";
 
 const Borrow = () => {
   const [borrowData, setborrowData] = useState<BorrowModel | null>(null);
 
   const fetchBorrowData = async () => {
     const data = await getBorrowData();
-    console.log(data)
+    console.log(data);
     setborrowData(data);
   };
 
@@ -41,7 +42,7 @@ const Borrow = () => {
                 Book
               </th>
               <th scope="col" className="px-6 py-3">
-                Price
+                Fine
               </th>
               <th scope="col" className="px-6 py-3">
                 Manage
@@ -58,23 +59,22 @@ const Borrow = () => {
                   scope="row"
                   className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                 >
-                  {borrow.b_id}
-                </th>
-                <td className="px-6 py-4">
                   {new Date(borrow.br_date_br!).toLocaleDateString("th-TH") ??
                     ""}
-                </td>
+                </th>
                 <td className="px-6 py-4">
-                  {new Date(borrow.br_date_rt!).toLocaleDateString("th-TH") ??
-                    ""}
+                  {borrow.br_date_rt != null ? new Date(borrow.br_date_rt!).toLocaleDateString("th-TH") : 
+                    "Not Return"}
                 </td>
+
                 <td className="px-6 py-4">{borrow.user?.m_name}</td>
                 <td className="px-6 py-4">{borrow.book?.b_name}</td>
+                <td className="px-6 py-4">{borrow.br_fine}</td>
                 <td className="px-6 py-4">
-                  <ModalEdit
-                    bid={borrow.b_id!}
+                  <ModalEditBorrow
+                    bid={borrow.br_date_br!}
                     data={borrow}
-                    key={borrow.b_id}
+                    key={borrow.br_date_br}
                     fetchData={fetchBorrowData}
                   />
                 </td>

@@ -64,7 +64,7 @@ export async function updateBorrow(bid: String, data: Datum) {
   }
 }
 
-export async function returnBorrow(data: Datum) {
+export async function returnBorrow(data: Datum,brid : string) {
   try {
     const resp = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_API}borrow/return`,
@@ -73,7 +73,11 @@ export async function returnBorrow(data: Datum) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          "br_fine":data.br_fine,
+          "br_date_rt":data.br_date_rt,
+          "br_date_br":brid
+        }),
       }
     );
 

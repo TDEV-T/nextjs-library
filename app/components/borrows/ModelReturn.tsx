@@ -1,50 +1,27 @@
 import { Dialog, Transition } from "@headlessui/react";
 import React, { Fragment, useEffect, useRef, useState } from "react";
-import { BorrowModel, Datum } from "@/app/model/BorrowModel";
-import { BookData } from "@/app/model/BookModel";
-import { MemberModel } from "@/app/model/MemberModel";
+import { Datum } from "@/app/model/BorrowModel";
 import { toast } from "sonner";
-import { deleteBook, getBookData, updateBook } from "@/app/service/book";
-import { getMemberData } from "@/app/service/member";
-import { updateBorrow } from "@/app/service/borrow";
-import ModalReturn from "./ModelReturn";
+import { createBorrow, returnBorrow } from "@/app/service/borrow";
 
-const ModalEditBorrow = ({
-  bid,
-  data,
+const ModalReturn = ({
   fetchData,
+  dataIncome,
 }: {
-  bid: String;
-  data: Datum;
   fetchData: any;
+  dataIncome: Datum;
 }) => {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState<Datum | null>(data);
-  const [bookData, setbookData] = useState<BookData | null>(null);
-  const [memberData, setMemberData] = useState<MemberModel | null>(null);
-
-  useEffect(() => {
-    fetchDataAll();
-  }, []);
-
-  const fetchDataAll = async () => {
-    const bdata = await getBookData();
-    setbookData(bdata);
-
-    const mdata = await getMemberData();
-    setMemberData(mdata);
-  };
+  const [formData, setFormData] = useState<Datum | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    const data = await updateBorrow(bid, formData!);
-    if (data.status != null && data.status) {
+    const data = await returnBorrow(formData!, dataIncome.br_date_br!);
+    if (data.status) {
       toast.success(data.message);
       await fetchData();
     } else {
@@ -58,37 +35,20 @@ const ModalEditBorrow = ({
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleDelete = async (e: any) => {
-    e.preventDefault();
-    const data = await deleteBook(formData?.b_id!);
-    if (data.status != null && data.status) {
-      toast.success(data.message);
-      await fetchData();
-    } else {
-      toast.error(data.message);
-    }
-  };
-
-  const formatDate = (date: string) => {
-    let DateFormat = new Date(date);
-    let dateString = DateFormat.toISOString().substring(0, 16);
-
-    return dateString;
-  };
-
   const cancelButtonRef = useRef(null);
   return (
     <>
       <button
         data-modal-target="default-modal"
         data-modal-toggle="default-modal"
-        className="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        className="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 disabled:bg-gray-300 disabled:hover:bg-gray-300"
         type="button"
+        disabled={dataIncome?.br_date_rt != null}
         onClick={() => {
           setOpen(true);
         }}
       >
-        Edit Borrow
+        Return
       </button>
       <Transition.Root show={open} as={Fragment}>
         <Dialog
@@ -138,30 +98,8 @@ const ModalEditBorrow = ({
                             <div className="relative z-0 w-full mb-5 group">
                               <input
                                 type="datetime-local"
-                                name="br_date_br"
-                                value={formatDate(formData?.br_date_rt!)}
-                                onChange={handleChange}
-                                id="floating_email"
-                                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                                placeholder=" "
-                                required
-                              />
-                              <label
-                                htmlFor="floating_email"
-                                className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-                              >
-                                Borrow Date
-                              </label>
-                            </div>
-                            <div className="relative z-0 w-full mb-5 group">
-                              <input
-                                type="datetime-local"
                                 name="br_date_rt"
-                                value={
-                                  formData?.br_date_rt != null
-                                    ? formatDate(formData?.br_date_rt!)
-                                    : ""
-                                }
+                                value={formData?.br_date_br!}
                                 onChange={handleChange}
                                 id="floating_password"
                                 className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
@@ -174,55 +112,6 @@ const ModalEditBorrow = ({
                               >
                                 Date Return
                               </label>
-                            </div>
-                            <div className="relative z-0 w-full mb-5 group">
-                              <div>
-                                <label
-                                  htmlFor="countries"
-                                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                                >
-                                  Member Borrow
-                                </label>
-                                <select
-                                  name="m_user"
-                                  value={formData?.m_user}
-                                  onChange={handleChangeSelect}
-                                  id="countries"
-                                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                >
-                                  <option selected>Choose a Member</option>
-                                  {memberData?.data?.map((mem, index) => (
-                                    <option value={mem.m_user}>
-                                      {mem.m_name}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
-                            </div>
-
-                            <div className="relative z-0 w-full mb-5 group">
-                              <div>
-                                <label
-                                  htmlFor="countries"
-                                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                                >
-                                  Book Borrow
-                                </label>
-                                <select
-                                  name="b_id"
-                                  value={formData?.b_id}
-                                  onChange={handleChangeSelect}
-                                  id="countries"
-                                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                >
-                                  <option selected>Choose a Book</option>
-                                  {bookData?.data?.map((book, index) => (
-                                    <option value={book.b_id}>
-                                      {book.b_name}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
                             </div>
 
                             <div className="relative z-0 w-full mb-5 group">
@@ -248,7 +137,7 @@ const ModalEditBorrow = ({
                               type="submit"
                               className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                             >
-                              Edit
+                              Return
                             </button>
                           </form>
                         </div>
@@ -256,7 +145,6 @@ const ModalEditBorrow = ({
                     </div>
                   </div>
                   <div className="bg-gray-50 px-4 dark:bg-gray-700 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                    <ModalReturn dataIncome={formData!} fetchData={fetchData}/>
                     <button
                       type="button"
                       className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
@@ -276,4 +164,4 @@ const ModalEditBorrow = ({
   );
 };
 
-export default ModalEditBorrow;
+export default ModalReturn;
