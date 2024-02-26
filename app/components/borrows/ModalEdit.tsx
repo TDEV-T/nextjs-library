@@ -219,7 +219,7 @@ const ModalEditBorrow = ({
                                 >
                                   <option selected>Choose a Member</option>
                                   {memberData?.data?.map((mem, index) => (
-                                    <option value={mem.m_user}>
+                                    <option key={index} value={mem.m_user}>
                                       {mem.m_name}
                                     </option>
                                   ))}
@@ -244,7 +244,7 @@ const ModalEditBorrow = ({
                                 >
                                   <option selected>Choose a Book</option>
                                   {bookData?.data?.map((book, index) => (
-                                    <option value={book.b_id}>
+                                    <option key={index} value={book.b_id}>
                                       {book.b_name}
                                     </option>
                                   ))}
@@ -284,7 +284,11 @@ const ModalEditBorrow = ({
                     </div>
                   </div>
                   <div className="bg-gray-50 px-4 dark:bg-gray-700 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                    <ModalReturn oldData = {dataLocal!} dataIncome={formData!} fetchData={fetchData} />
+                    <ModalReturn
+                      oldData={dataLocal!}
+                      dataIncome={formData!}
+                      fetchData={fetchData}
+                    />
                     <button
                       type="button"
                       className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"

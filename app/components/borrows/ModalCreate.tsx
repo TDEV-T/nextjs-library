@@ -159,7 +159,7 @@ const ModalCreateBorrow = ({ fetchData }: { fetchData: any }) => {
                                 >
                                   <option selected>Choose a Member</option>
                                   {memberData?.data?.map((mem,index) => (
-                                    <option value={mem.m_user}>{mem.m_name}</option>
+                                    <option key={index} value={mem.m_user}>{mem.m_name}</option>
                                   ))}
                                 </select>
                               </div>
@@ -182,7 +182,7 @@ const ModalCreateBorrow = ({ fetchData }: { fetchData: any }) => {
                                 >
                                   <option selected>Choose a Book</option>
                                   {bookData?.data?.map((book,index) => (
-                                    <option value={book.b_id}>{book.b_name}</option>
+                                    <option key={index} value={book.b_id}>{book.b_name}</option>
                                   ))}
                                 </select>
                               </div>
