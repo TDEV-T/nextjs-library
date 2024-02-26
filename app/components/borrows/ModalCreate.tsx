@@ -106,9 +106,9 @@ const ModalCreateBorrow = ({ fetchData }: { fetchData: any }) => {
                             className="max-w-md mx-auto"
                             onSubmit={handleSubmit}
                           >
-                            {/* <div className="relative z-0 w-full mb-5 group">
+                            <div className="relative z-0 w-full mb-5 group">
                               <input
-                                type="datetime-local"
+                                type="date"
                                 name="br_date_br"
                                 value={formData?.br_date_br!}
                                 onChange={handleChange}
@@ -123,7 +123,7 @@ const ModalCreateBorrow = ({ fetchData }: { fetchData: any }) => {
                               >
                                 Borrow Date
                               </label>
-                            </div> */}
+                            </div>
                             {/* <div className="relative z-0 w-full mb-5 group">
                               <input
                                 type="datetime-local"

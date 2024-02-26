@@ -1,4 +1,4 @@
-import { Datum } from "../model/BorrowModel";
+import { BorrowReturn, Datum, borrowDataOld, borrowDataUpdate } from "../model/BorrowModel";
 
 export async function getBorrowData() {
   try {
@@ -40,10 +40,10 @@ export async function createBorrow(data: Datum) {
     console.log(e);
   }
 }
-export async function updateBorrow(bid: String, data: Datum) {
+export async function updateBorrow(data:borrowDataUpdate) {
   try {
     const resp = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}borrow/${bid}`,
+      `${process.env.NEXT_PUBLIC_BASE_API}borrow`,
       {
         method: "PATCH",
         headers: {
@@ -64,7 +64,7 @@ export async function updateBorrow(bid: String, data: Datum) {
   }
 }
 
-export async function returnBorrow(data: Datum,brid : string) {
+export async function returnBorrow(data: BorrowReturn) {
   try {
     const resp = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_API}borrow/return`,
@@ -73,11 +73,7 @@ export async function returnBorrow(data: Datum,brid : string) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          "br_fine":data.br_fine,
-          "br_date_rt":data.br_date_rt,
-          "br_date_br":brid
-        }),
+        body: JSON.stringify(data),
       }
     );
 

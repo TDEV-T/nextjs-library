@@ -1,15 +1,17 @@
 import { Dialog, Transition } from "@headlessui/react";
 import React, { Fragment, useEffect, useRef, useState } from "react";
-import { Datum } from "@/app/model/BorrowModel";
+import { BorrowReturn, Datum, borrowDataOld } from "@/app/model/BorrowModel";
 import { toast } from "sonner";
 import { createBorrow, returnBorrow } from "@/app/service/borrow";
 
 const ModalReturn = ({
   fetchData,
   dataIncome,
+  oldData
 }: {
   fetchData: any;
   dataIncome: Datum;
+  oldData:borrowDataOld
 }) => {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<Datum | null>(null);
@@ -20,7 +22,16 @@ const ModalReturn = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = await returnBorrow(formData!, dataIncome.br_date_br!);
+
+    var dataReturn : BorrowReturn = {
+      br_date_br_old :  oldData.br_date_br_old,
+      m_user_old : oldData.m_user_old,
+      b_id_old : oldData.b_id_old,
+      br_fine: formData?.br_fine,
+      br_date_rt: formData?.br_date_rt
+    }
+
+    const data = await returnBorrow(dataReturn);
     if (data.status) {
       toast.success(data.message);
       await fetchData();
@@ -97,7 +108,7 @@ const ModalReturn = ({
                           >
                             <div className="relative z-0 w-full mb-5 group">
                               <input
-                                type="datetime-local"
+                                type="date"
                                 name="br_date_rt"
                                 value={formData?.br_date_br!}
                                 onChange={handleChange}

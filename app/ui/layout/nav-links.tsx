@@ -1,5 +1,5 @@
 "use client";
-import { FileAddOutlined, BookOutlined, UserOutlined } from "@ant-design/icons";
+import { FileAddOutlined, BookOutlined, UserOutlined,UnorderedListOutlined } from "@ant-design/icons";
 import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -7,7 +7,8 @@ import { usePathname } from "next/navigation";
 const links = [
     { name: "Borrow", href: "/", icon: FileAddOutlined },
     { name: "Books", href: "/manage/books", icon: BookOutlined },
-    { name: "Members", href: "/manage/members", icon: UserOutlined }
+    { name: "Members", href: "/manage/members", icon: UserOutlined },
+    { name: "Stats" , href: "/manage/stats",icon: UnorderedListOutlined }
 ];
 
 export default function NavLinks() {

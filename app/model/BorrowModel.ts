@@ -20,6 +20,31 @@ export type Datum = {
   book?: Book;
 };
 
+export type borrowDataUpdate = {
+  br_date_br?: string;
+  br_date_rt?: string;
+  m_user?: string;
+  b_id?: string;
+  br_fine?: number;
+  br_date_rt_old?: string;
+  m_user_old?: string;
+  b_id_old?: string;
+}
+
+export type borrowDataOld = {
+  br_date_br_old?: string;
+  m_user_old?: string;
+  b_id_old?: string;
+}
+
+export type BorrowReturn = {
+  br_fine? : number,
+  br_date_rt? :string,
+  br_date_br_old?:string,
+  m_user_old?:string,
+  b_id_old?:string,
+}
+
 export type Book = {
   b_id?: string;
   b_name?: string;

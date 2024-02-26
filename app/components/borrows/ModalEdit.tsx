@@ -1,6 +1,11 @@
 import { Dialog, Transition } from "@headlessui/react";
 import React, { Fragment, useEffect, useRef, useState } from "react";
-import { BorrowModel, Datum } from "@/app/model/BorrowModel";
+import {
+  BorrowModel,
+  Datum,
+  borrowDataUpdate,
+  borrowDataOld,
+} from "@/app/model/BorrowModel";
 import { BookData } from "@/app/model/BookModel";
 import { MemberModel } from "@/app/model/MemberModel";
 import { toast } from "sonner";
@@ -22,9 +27,11 @@ const ModalEditBorrow = ({
   const [formData, setFormData] = useState<Datum | null>(data);
   const [bookData, setbookData] = useState<BookData | null>(null);
   const [memberData, setMemberData] = useState<MemberModel | null>(null);
+  const [dataLocal, setDataLocal] = useState<borrowDataOld | null>(null);
 
   useEffect(() => {
     fetchDataAll();
+    setLocalData();
   }, []);
 
   const fetchDataAll = async () => {
@@ -35,6 +42,14 @@ const ModalEditBorrow = ({
     setMemberData(mdata);
   };
 
+  const setLocalData = () => {
+    setDataLocal({
+      br_date_br_old: formData?.br_date_br,
+      b_id_old: formData?.b_id,
+      m_user_old: formData?.m_user,
+    });
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -43,7 +58,18 @@ const ModalEditBorrow = ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const data = await updateBorrow(bid, formData!);
+    var DatUpdate: borrowDataUpdate = {
+      b_id: formData?.b_id,
+      br_date_br: formData?.br_date_br,
+      br_date_rt: formData?.br_date_rt,
+      br_fine: formData?.br_fine,
+      m_user: formData?.m_user,
+      br_date_rt_old: dataLocal?.br_date_br_old,
+      m_user_old: dataLocal?.m_user_old,
+      b_id_old: dataLocal?.b_id_old,
+    };
+
+    const data = await updateBorrow(DatUpdate);
     if (data.status != null && data.status) {
       toast.success(data.message);
       await fetchData();
@@ -71,7 +97,7 @@ const ModalEditBorrow = ({
 
   const formatDate = (date: string) => {
     let DateFormat = new Date(date);
-    let dateString = DateFormat.toISOString().substring(0, 16);
+    let dateString = DateFormat.toISOString().split("T")[0];
 
     return dateString;
   };
@@ -137,9 +163,9 @@ const ModalEditBorrow = ({
                           >
                             <div className="relative z-0 w-full mb-5 group">
                               <input
-                                type="datetime-local"
+                                type="date"
                                 name="br_date_br"
-                                value={formatDate(formData?.br_date_rt!)}
+                                value={formatDate(formData?.br_date_br!)}
                                 onChange={handleChange}
                                 id="floating_email"
                                 className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
@@ -155,13 +181,14 @@ const ModalEditBorrow = ({
                             </div>
                             <div className="relative z-0 w-full mb-5 group">
                               <input
-                                type="datetime-local"
+                                type="date"
                                 name="br_date_rt"
                                 value={
                                   formData?.br_date_rt != null
                                     ? formatDate(formData?.br_date_rt!)
                                     : ""
                                 }
+                                disabled={formData?.br_date_rt == null}
                                 onChange={handleChange}
                                 id="floating_password"
                                 className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
@@ -234,6 +261,7 @@ const ModalEditBorrow = ({
                                 id="floating_repeat_password"
                                 className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                                 placeholder=" "
+                                disabled={formData?.br_date_rt == null}
                                 required
                               />
                               <label
@@ -256,7 +284,7 @@ const ModalEditBorrow = ({
                     </div>
                   </div>
                   <div className="bg-gray-50 px-4 dark:bg-gray-700 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                    <ModalReturn dataIncome={formData!} fetchData={fetchData}/>
+                    <ModalReturn oldData = {dataLocal!} dataIncome={formData!} fetchData={fetchData} />
                     <button
                       type="button"
                       className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
