@@ -2,11 +2,28 @@
 import ModalCreateMember from "@/app/components/members/ModalCreate";
 import ModalEditMember from "@/app/components/members/ModalEdit";
 import { MemberModel } from "@/app/model/MemberModel";
-import { getMemberData } from "@/app/service/member";
+import { getMemberData, searchMemberData } from "@/app/service/member";
 import React, { useEffect, useState } from "react";
 
 const Members = () => {
   const [memberData, setmemberData] = useState<MemberModel | null>(null);
+  const [search, setsearch] = useState<string | null>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setsearch(e.target.value);
+  };
+
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (search != null) {
+      const data = await searchMemberData(search);
+      setmemberData(data);
+    } else {
+      await fetchMemberData();
+    }
+  };
+
 
   const fetchMemberData = async () => {
     const data = await getMemberData();
@@ -21,6 +38,27 @@ const Members = () => {
   return (
     <>
       <div className="w-full flex justify-end p-3">
+      <form className="me-3 grid grid-cols-3" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            value={search!}
+            onChange={handleChange}
+            id="first_name"
+            className="col-span-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder=""
+            
+          />
+
+          <button
+            data-modal-target="default-modal"
+            data-modal-toggle="default-modal"
+            className="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 "
+            type="submit"
+          >
+            Search
+          </button>
+      </form>
+
         <ModalCreateMember fetchData={fetchMemberData} />
       </div>
       <div className="relative overflow-x-auto rounded-lg">
